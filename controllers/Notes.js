@@ -1,6 +1,8 @@
 // Notes Controller
 // '/notes'
 
+//These RESTful patterns taken from http://www.vinaysahni.com/best-practices-for-a-pragmatic-restful-api
+
 module.exports = function (app) {
   var mongoose = require('mongoose'),
       db = require('../db'),
@@ -8,6 +10,7 @@ module.exports = function (app) {
       
   app.resource('/', {
     'get' : function(req, res) {
+      //Lists all notes
       db.Note.find({}).exec(function(err, result) { 
         if (!err) { 
           res.end(JSON.stringify(result, undefined, 2));
@@ -18,33 +21,9 @@ module.exports = function (app) {
       });
     },
 
-    /*'put' : function(req, res) {
-      var test_data = {created_at: Date(), title: 'test-title', content: 'some content'};
-      var test = new db.Note(test_data);
-      test.save(function(err, result) {
-        if (!err) { 
-          res.end('added!');
-        } else {
-          // error handling
-          res.end('not added!');
-        }
-      });
-    }*/
-  });
-
-  app.resource('/:title', {
-    'get' : function(req, res) {
-      db.Note.findOne({'title':req.params.title}).exec(function(err, result) {
-        if (!err) {
-          res.end(JSON.stringify(result, undefined, 2));
-        } else {
-          res.end('An error occurred');
-        };
-      });
-    },
-
-    'put' : function(req, res) {
-      var entry_data = {created_at: Date(), title: req.params.title, content: req.query.body};
+    'post' : function(req, res) {
+      //Creates a new note
+      var entry_data = {created_at: Date(), title: req.body.title, content: req.body.content};
       var entry = new db.Note(entry_data);
       entry.save(function(err, result) {
         if (!err) {
@@ -52,6 +31,19 @@ module.exports = function (app) {
         } else {
           res.end('Not Added!');
         }
+      });
+    }
+  });
+
+  app.resource('/:title', {
+    'get' : function(req, res) {
+      //Gets a specific note by title
+      db.Note.findOne({'title':req.params.title}).exec(function(err, result) {
+        if (!err) {
+          res.end(JSON.stringify(result, undefined, 2));
+        } else {
+          res.end('An error occurred');
+        };
       });
     },
 
