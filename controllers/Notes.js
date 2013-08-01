@@ -21,8 +21,14 @@ module.exports = function (app) {
       });
     },
 
-    'post' : function(req, res) {
+    'post' : function(req, res, next) {
       //Creates a new note
+      if (!req.body.title) {
+        res.end('Missing title parameter');
+      }
+      if (!req.body.content) {
+        return next({ status: 400, err: "Missing content parameter!" });
+      }
       var entry_data = {created_at: Date(), title: req.body.title, content: req.body.content};
       var entry = new db.Note(entry_data);
       entry.save(function(err, result) {
@@ -48,6 +54,7 @@ module.exports = function (app) {
     },
 
     'delete' : function(req, res) {
+      //Delete a note by title
       db.Note.remove({title : req.params.title}, function(err, result) {
         if (!err) {
           res.end('Deleted');
